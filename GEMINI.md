@@ -10,6 +10,8 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
     - `dto`: Objetos de transferência de dados (`TransactionRequestDTO`).
     - `service`: Lógica de negócio e integração com Kafka.
     - `controller`: Endpoints REST.
+    - `config`: Configurações de infraestrutura (Kafka, etc).
+    - `exception`: Tratamento global de exceções.
 - **Messaging:** Apache Kafka em modo KRaft (Porta 9092).
 - **Persistence Strategy:** Por enquanto, as transações são enviadas apenas para o tópico `transactions-topic` no Kafka.
 
@@ -25,3 +27,5 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
 2. **Naming:** Preferir o sufixo `DTO` para classes na camada de transferência.
 3. **Kafka:** As mensagens devem ser enviadas com `accountId` como chave para garantir ordem por conta.
 4. **Validation:** Utilizar `jakarta.validation` no Controller para fail-fast.
+5. **Errors:** Utilizar o `GlobalExceptionHandler` para padronizar respostas de erro.
+6. **Kafka Topics:** Os tópicos devem ser criados programaticamente via `KafkaConfig`.
