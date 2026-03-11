@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulação de Testes - Sentinel Transaction Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        header { background: #2c3e50; color: #fff; padding: 1rem; text-align: center; border-radius: 8px 8px 0 0; }
+        nav { background: #ecf0f1; padding: 10px; border-radius: 0 0 8px 8px; margin-bottom: 20px; display: flex; justify-content: space-around; flex-wrap: wrap; }
+        nav a { text-decoration: none; color: #2980b9; font-weight: bold; margin: 5px 10px; }
+        section { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        pre { background-color: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        .step { background-color: #e8f4fd; border-left: 4px solid #3498db; padding: 10px; margin: 10px 0; border-radius: 0 4px 4px 0; }
+        code { color: #f1c40f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentinel Transaction Service</h1>
+        <p>Simulação de Tráfego e Validação de Fluxo</p>
+    </header>
+    
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="architecture.html">Arquitetura</a>
+        <a href="fraud-detection.html">Detecção de Fraude</a>
+        <a href="api-endpoints.html">API REST</a>
+        <a href="frontend-integration.html">Integração React</a>
+        <a href="testing-simulation.html" style="color:#2c3e50;">Simulação de Testes</a>
+    </nav>
+
+    <section>
+        <h2>O Pipeline de Validação</h2>
+        <p>Para garantir que a lógica de <strong>Kafka Streams</strong> e o roteamento de mensagens estejam funcionando, utilizamos um script de automação que simula comportamentos reais de usuários.</p>
+        
+        <div class="step">
+            <strong>Script:</strong> <code>simulate-traffic.sh</code><br>
+            <strong>Objetivo:</strong> Enviar rajadas de transações via <code>curl</code> para o endpoint de ingestão.
+        </div>
+    </section>
+
+    <section>
+        <h2>Cenário de Teste: Rajada de Transações (Burst)</h2>
+        <p>A regra de fraude atual define que mais de <strong>3 transações em menos de 2 minutos</strong> para a mesma conta é considerado comportamento suspeito.</p>
+        <ol>
+            <li>O script envia 1 transação normal para <code>USER-001</code> (Aprovada).</li>
+            <li>O script envia 4 transações consecutivas para <code>ACC-FRAUD-01</code>.</li>
+            <li><strong>Resultado esperado:</strong> As 3 primeiras da rajada são validadas, a 4ª dispara um alerta.</li>
+        </ol>
+        
+        <h3>Execução do Script</h3>
+        <pre>chmod +x simulate-traffic.sh
+./simulate-traffic.sh</pre>
+    </section>
+
+    <section>
+        <h2>Verificação no AKHQ</h2>
+        <p>Após a simulação, os dados podem ser analisados visualmente:</p>
+        <ul>
+            <li><code>transactions-raw</code>: Contém os 5 eventos originais (JSON bruto).</li>
+            <li><code>transactions-validated</code>: Contém os 4 eventos aprovados pelo processador.</li>
+            <li><code>transactions-alerts</code>: Contém o 5º evento (a 4ª transação da conta suspeita) marcado como <code>REJECTED</code>.</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Sentinel Solution - Helal Ferrari Ferrari</p>
+    </footer>
+</body>
+</html>
