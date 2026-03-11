@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detecção de Fraude - Sentinel Transaction Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        header { background: #2c3e50; color: #fff; padding: 1rem; text-align: center; border-radius: 8px 8px 0 0; }
+        nav { background: #ecf0f1; padding: 10px; border-radius: 0 0 8px 8px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        nav a { text-decoration: none; color: #2980b9; font-weight: bold; }
+        section { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        .logic-card { background-color: #f0f4f8; padding: 15px; border-left: 5px solid #2980b9; margin: 10px 0; border-radius: 0 4px 4px 0; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentinel Transaction Service</h1>
+        <p>Lógica de Detecção de Fraude (Kafka Streams)</p>
+    </header>
+    
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="architecture.html">Arquitetura</a>
+        <a href="fraud-detection.html" style="color:#2c3e50;">Detecção de Fraude</a>
+        <a href="api-endpoints.html">API REST</a>
+    </nav>
+
+    <section>
+        <h2>Lógica de Janela de Tempo (Windowing)</h2>
+        <p>A detecção de comportamento atípico utiliza o conceito de <strong>Tumbling Window</strong>.</p>
+        <div class="logic-card">
+            <p><strong>Configuração:</strong> Janelas de tempo de <strong>2 minutos</strong>.</p>
+            <p><strong>Limite:</strong> Máximo de <strong>3 transações</strong> por conta.</p>
+        </div>
+        <p>Se uma conta (<code>accountId</code>) exceder este limite dentro da janela, todas as transações subsequentes na mesma janela são marcadas como suspeitas.</p>
+    </section>
+
+    <section>
+        <h2>Roteamento Inteligente</h2>
+        <p>O processador atua como um roteador dinâmico:</p>
+        <ul>
+            <li><strong>Fluxo de Aprovação:</strong> Transações abaixo do limite são enviadas ao tópico <code>transactions-validated</code>.</li>
+            <li><strong>Fluxo de Alerta:</strong> Transações que violam a regra são enviadas ao tópico <code>transactions-alerts</code> para análise posterior ou bloqueio.</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Sentinel Solution - Helal Ferrari Ferrari</p>
+    </footer>
+</body>
+</html>

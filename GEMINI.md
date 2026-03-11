@@ -13,7 +13,17 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
     - `config`: Configurações de infraestrutura (Kafka, etc).
     - `exception`: Tratamento global de exceções.
 - **Messaging:** Apache Kafka em modo KRaft (Porta 9092).
-- **Persistence Strategy:** Por enquanto, as transações são enviadas apenas para o tópico `transactions-topic` no Kafka.
+- **Data Streaming & Fraud Detection:**
+    - **Kafka Streams:** Processamento em tempo real habilitado.
+    - **Topologia:**
+        1. Consome de `transactions-raw`.
+        2. Agrupa por `accountId`.
+        3. Janela: **Tumbling Window de 2 minutos**.
+        4. Regra de Fraude: Se `count > 3` transações na janela, marca como `REJECTED`.
+        5. Roteamento (Branching):
+            - Sucesso: `transactions-validated`.
+            - Suspeita/Erro: `transactions-alerts`.
+- **Persistence Strategy:** Por enquanto, as transações são enviadas apenas para os tópicos do Kafka.
 
 ## Technical Stack
 - Java 21 (GraalVM CE)

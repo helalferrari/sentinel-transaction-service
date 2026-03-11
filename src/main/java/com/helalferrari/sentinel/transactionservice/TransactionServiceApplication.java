@@ -7,6 +7,7 @@ import org.springframework.kafka.annotation.EnableKafkaStreams;
 
 @SpringBootApplication
 @EnableKafka
+@EnableKafkaStreams
 public class TransactionServiceApplication {
 
     public static void main(String[] args) {

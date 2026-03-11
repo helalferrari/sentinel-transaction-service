@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Arquitetura - Sentinel Transaction Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        header { background: #2c3e50; color: #fff; padding: 1rem; text-align: center; border-radius: 8px 8px 0 0; }
+        nav { background: #ecf0f1; padding: 10px; border-radius: 0 0 8px 8px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        nav a { text-decoration: none; color: #2980b9; font-weight: bold; }
+        section { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        pre { background-color: #f8f9fa; padding: 15px; border-radius: 5px; border: 1px solid #ddd; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        code { color: #d63384; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentinel Transaction Service</h1>
+        <p>Arquitetura e Fluxo de Dados</p>
+    </header>
+    
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="architecture.html" style="color:#2c3e50;">Arquitetura</a>
+        <a href="fraud-detection.html">Detecção de Fraude</a>
+        <a href="api-endpoints.html">API REST</a>
+    </nav>
+
+    <section>
+        <h2>Fluxo de Dados</h2>
+        <p>O fluxo de dados segue uma jornada do cliente até os tópicos de saída finais.</p>
+        <ol>
+            <li>O <strong>Client</strong> faz um POST para <code>/api/transactions</code>.</li>
+            <li>O <strong>Controller</strong> valida o JSON da requisição.</li>
+            <li>O <strong>Service</strong> gera metadados (ID, Timestamp, Status PENDING).</li>
+            <li>A transação é publicada no tópico <code>transactions-raw</code>.</li>
+            <li>O <strong>Kafka Streams</strong> consome de <code>transactions-raw</code>, analisa a janela e roteia para <code>transactions-validated</code> ou <code>transactions-alerts</code>.</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Componentes do Sistema</h2>
+        <ul>
+            <li><strong>Model (Transaction)</strong>: Classe central contendo o estado da transação.</li>
+            <li><strong>DTO (TransactionRequestDTO)</strong>: Objeto simplificado para recepção de requisições.</li>
+            <li><strong>Service</strong>: Core de negócio para criação de transações.</li>
+            <li><strong>KafkaConfig</strong>: Responsável pelo <code>KafkaTemplate</code> e criação automática de tópicos.</li>
+            <li><strong>FraudStreamProcessor</strong>: A topologia Kafka Streams (Core Inteligente).</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Sentinel Solution - Helal Ferrari Ferrari</p>
+    </footer>
+</body>
+</html>
