@@ -1,5 +1,6 @@
 package com.helalferrari.sentinel.transactionservice.service;
 
+import com.helalferrari.sentinel.transactionservice.config.KafkaConfig;
 import com.helalferrari.sentinel.transactionservice.dto.TransactionRequestDTO;
 import com.helalferrari.sentinel.transactionservice.model.Transaction;
 import com.helalferrari.sentinel.transactionservice.model.TransactionStatus;
@@ -48,6 +49,6 @@ class TransactionServiceTest {
         assertThat(result.getTimestamp()).isNotNull();
 
         // Verify Kafka interaction
-        verify(kafkaTemplate).send(eq("transactions-topic"), eq("ACC123"), any(Transaction.class));
+        verify(kafkaTemplate).send(eq(KafkaConfig.TRANSACTIONS_RAW_TOPIC), eq("ACC123"), any(Transaction.class));
     }
 }

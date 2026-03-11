@@ -1,5 +1,6 @@
 package com.helalferrari.sentinel.transactionservice.service;
 
+import com.helalferrari.sentinel.transactionservice.config.KafkaConfig;
 import com.helalferrari.sentinel.transactionservice.model.Transaction;
 import com.helalferrari.sentinel.transactionservice.model.TransactionStatus;
 import com.helalferrari.sentinel.transactionservice.dto.TransactionRequestDTO;
@@ -17,7 +18,6 @@ import java.util.UUID;
 public class TransactionService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-    private static final String TOPIC = "transactions-topic";
 
     public Transaction processTransaction(TransactionRequestDTO request) {
         log.info("Processing transaction for account: {}", request.getAccountId());
@@ -32,7 +32,7 @@ public class TransactionService {
                 .build();
 
         // Envia para o Kafka
-        kafkaTemplate.send(TOPIC, transaction.getAccountId(), transaction);
+        kafkaTemplate.send(KafkaConfig.TRANSACTIONS_RAW_TOPIC, transaction.getAccountId(), transaction);
         
         log.info("Transaction sent to Kafka: {}", transaction.getId());
         return transaction;
