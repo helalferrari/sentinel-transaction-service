@@ -10,8 +10,9 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
     - `dto`: Objetos de transferência de dados (`TransactionRequestDTO`).
     - `service`: Lógica de negócio e integração com Kafka.
     - `controller`: Endpoints REST.
-    - `config`: Configurações de infraestrutura (Kafka, etc).
+    - `config`: Configurações de infraestrutura (Kafka, WebSocket, etc).
     - `exception`: Tratamento global de exceções.
+    - `streams`: Topologias de processamento em tempo real.
 - **Messaging:** Apache Kafka em modo KRaft (Porta 9092).
 - **Data Streaming & Fraud Detection:**
     - **Kafka Streams:** Processamento em tempo real habilitado.
@@ -39,5 +40,10 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
 4. **Validation:** Utilizar `jakarta.validation` no Controller para fail-fast.
 5. **Errors:** Utilizar o `GlobalExceptionHandler` para padronizar respostas de erro.
 6. **Kafka Topics:** Os tópicos devem ser criados programaticamente via `KafkaConfig`.
-7. **Documentation Maintenance (Mandatory):** Toda evolução arquitetural, nova funcionalidade ou mudança em regra de negócio DEVE ser refletida imediatamente neste arquivo (`GEMINI.md`) e na documentação técnica em HTML localizada em `/docs/`. 
-8. **Context Start:** Ao iniciar uma nova sessão, o Gemini CLI deve ler este arquivo primeiro para garantir a continuidade da evolução do projeto.
+7. **Kafka Streams Activation:** A anotação `@EnableKafkaStreams` deve residir em uma classe de configuração dedicada (`KafkaStreamsConfig`) protegida pelo profile `!test`. Isso evita falhas em testes de slice.
+8. **Testing Strategy:**
+    - **Unit:** Mockito para Service e Consumer.
+    - **Web Slice:** `MockMvc` para Controllers (isolado do Kafka via profiles).
+    - **Streams Topology:** Utilizar `TopologyTestDriver` para validar a lógica de fraude.
+9. **Documentation Maintenance (Mandatory):** Toda evolução arquitetural ou mudança em regra de negócio DEVE ser refletida neste arquivo e em `/docs/`.
+10. **Context Start:** Ao iniciar uma nova sessão, o Gemini CLI deve ler este arquivo primeiro.

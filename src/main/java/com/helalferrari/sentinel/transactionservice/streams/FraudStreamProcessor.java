@@ -6,6 +6,7 @@ import com.helalferrari.sentinel.transactionservice.model.TransactionStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.kstream.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -39,15 +41,19 @@ public class FraudStreamProcessor {
                 .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofMinutes(2)))
                 .count();
 
-        // 3. Unir (Join) o fluxo original com a contagem atual para marcar fraudes
-        // Como o count é por janela, precisamos do stream para rotear o evento individual
-        KStream<String, Transaction> analyzedStream = rawStream.leftJoin(
-                countsTable,
+        // 3. Converter a KTable em KStream e extrair a chave String pura
+        KStream<String, Long> countStream = countsTable
+                .toStream()
+                .map((windowedKey, count) -> KeyValue.pair(windowedKey.key(), count));
+
+        // 4. Unir (Join) o fluxo original com a contagem atual
+        KStream<String, Transaction> analyzedStream = rawStream.join(
+                countStream,
                 (transaction, count) -> {
                     if (count != null && count > 3) {
-                        log.warn("SUSPICIOUS TRANSACTION DETECTED: Account {} has {} transactions in 2min window", 
+                        log.warn("🚨 FRAUDE DETECTADA: Conta {} com {} transações na janela.", 
                                  transaction.getAccountId(), count);
-                        transaction.setStatus(TransactionStatus.REJECTED); // Ou criar um status SUSPICIOUS
+                        transaction.setStatus(TransactionStatus.REJECTED);
                     } else {
                         transaction.setStatus(TransactionStatus.APPROVED);
                     }
@@ -57,15 +63,15 @@ public class FraudStreamProcessor {
                 StreamJoined.with(stringSerde, transactionSerde, Serdes.Long())
         );
 
-        // 4. Split / Roteamento
+        // 5. Roteamento (Split)
         Map<String, KStream<String, Transaction>> branches = analyzedStream.split(Named.as("fraud-"))
                 .branch((key, value) -> value.getStatus() == TransactionStatus.REJECTED, Branched.as("alerts"))
                 .defaultBranch(Branched.as("validated"));
 
-        // 5. Enviar para os respectivos tópicos
+        // 6. Enviar para os respectivos tópicos
         branches.get("fraud-alerts").to(KafkaConfig.TRANSACTIONS_ALERTS_TOPIC, Produced.with(stringSerde, transactionSerde));
         branches.get("fraud-validated").to(KafkaConfig.TRANSACTIONS_VALIDATED_TOPIC, Produced.with(stringSerde, transactionSerde));
 
-        log.info("Fraud Detection Topology Ready: Window=2m, Limit=3 per account.");
+        log.info("Topologia de Detecção de Fraude Corrigida e Ativa!");
     }
 }
