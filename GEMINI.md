@@ -39,3 +39,5 @@ Serviço responsável pelo processamento inicial de transações financeiras, va
 4. **Validation:** Utilizar `jakarta.validation` no Controller para fail-fast.
 5. **Errors:** Utilizar o `GlobalExceptionHandler` para padronizar respostas de erro.
 6. **Kafka Topics:** Os tópicos devem ser criados programaticamente via `KafkaConfig`.
+7. **Documentation Maintenance (Mandatory):** Toda evolução arquitetural, nova funcionalidade ou mudança em regra de negócio DEVE ser refletida imediatamente neste arquivo (`GEMINI.md`) e na documentação técnica em HTML localizada em `/docs/`. 
+8. **Context Start:** Ao iniciar uma nova sessão, o Gemini CLI deve ler este arquivo primeiro para garantir a continuidade da evolução do projeto.

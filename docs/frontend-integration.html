@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Integração Frontend - Sentinel Transaction Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f4f7f6; }
+        header { background: #2c3e50; color: #fff; padding: 1rem; text-align: center; border-radius: 8px 8px 0 0; }
+        nav { background: #ecf0f1; padding: 10px; border-radius: 0 0 8px 8px; margin-bottom: 20px; display: flex; justify-content: space-around; }
+        nav a { text-decoration: none; color: #2980b9; font-weight: bold; }
+        section { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 5px; }
+        pre { background-color: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        code { color: #f1c40f; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sentinel Transaction Service</h1>
+        <p>Integração em Tempo Real (WebSocket + React)</p>
+    </header>
+    
+    <nav>
+        <a href="index.html">Início</a>
+        <a href="architecture.html">Arquitetura</a>
+        <a href="fraud-detection.html">Detecção de Fraude</a>
+        <a href="api-endpoints.html">API REST</a>
+        <a href="frontend-integration.html" style="color:#2c3e50;">Integração React</a>
+    </nav>
+
+    <section>
+        <h2>Conectando via WebSocket</h2>
+        <p>O backend expõe um endpoint STOMP para notificações em tempo real usando WebSockets.</p>
+        <ul>
+            <li><strong>Endpoint:</strong> <code>ws://localhost:8081/ws-sentinel</code></li>
+            <li><strong>Topic:</strong> <code>/topic/alerts</code> (Escutar alertas de fraude)</li>
+        </ul>
+        
+        <h3>Exemplo de código no React (Stomp.js)</h3>
+        <pre>
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
+
+const socket = new SockJS('http://localhost:8081/ws-sentinel');
+const client = new Client({
+  webSocketFactory: () => socket,
+  onConnect: () => {
+    client.subscribe('/topic/alerts', (message) => {
+      const alert = JSON.parse(message.body);
+      console.warn("ALERTA DE FRAUDE RECEBIDO:", alert);
+    });
+  }
+});
+client.activate();</pre>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Sentinel Solution - Helal Ferrari Ferrari</p>
+    </footer>
+</body>
+</html>
